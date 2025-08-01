@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const promptInput = document.getElementById('prompt-input');
     const sendButton = document.getElementById('send-button');
     const messagesContainer = document.getElementById('messages');
+    const baseUrl = window.location.origin; // Obtiene la URL base de tu sitio
 
     sendButton.addEventListener('click', sendMessage);
     promptInput.addEventListener('keypress', (e) => {
@@ -12,42 +13,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function sendMessage() {
         const prompt = promptInput.value.trim();
-        if (!prompt) return;
+        if (prompt === '') return;
 
-        // Mostrar la pregunta del usuario
-        addMessageToChat('user', prompt);
+        // Muestra el mensaje del usuario en el chat
+        appendMessage(prompt, 'user');
         promptInput.value = '';
 
+        // Muestra un mensaje de "escribiendo" de la IA
+        const typingMessage = appendMessage('...', 'ai');
+
         try {
-            // Llamar a tu servidor backend
-            const response = await fetch('http://localhost:3000/ask-incluia', {
+            // Envía la solicitud al servidor de Render
+            const response = await fetch(`${baseUrl}/ask-incluia`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ prompt }),
+                body: JSON.stringify({ prompt: prompt })
             });
+
+            if (!response.ok) {
+                throw new Error('Error al conectar con el servidor.');
+            }
 
             const data = await response.json();
 
-            if (response.ok) {
-                // Mostrar la respuesta de la IA
-                addMessageToChat('ai', data.response);
-            } else {
-                addMessageToChat('error', data.error || 'Error desconocido.');
-            }
+            // Reemplaza el mensaje de "escribiendo" con la respuesta de la IA
+            typingMessage.textContent = data.response;
+
         } catch (error) {
-            console.error('Error al conectar con el servidor:', error);
-            addMessageToChat('error', 'No se pudo conectar con el servidor. Asegúrate de que está en ejecución.');
+            console.error('Error:', error);
+            typingMessage.textContent = 'Lo siento, hubo un error al obtener la respuesta.';
+            typingMessage.classList.add('error');
         }
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    function addMessageToChat(sender, text) {
+    function appendMessage(text, sender) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', sender);
         messageElement.textContent = text;
         messagesContainer.appendChild(messageElement);
-        // Hacer scroll para ver el último mensaje
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        return messageElement;
     }
 });
