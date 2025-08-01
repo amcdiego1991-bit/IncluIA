@@ -3,22 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IncluIA</title>
+    <title>IncluIA - Tu Asistente de Inclusión</title>
     <style>
-        body { font-family: sans-serif; background-color: #f0f0f0; padding: 20px; }
-        #chat-container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        #messages { border: 1px solid #ddd; height: 300px; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
-        .message.user { text-align: right; color: blue; }
-        .message.ai { text-align: left; color: green; }
-        .message.error { text-align: center; color: red; }
-        #input-area { display: flex; }
-        #prompt-input { flex-grow: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
-        #send-button { padding: 10px; margin-left: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        :root {
+            --main-bg-color: #000;
+            --main-text-color: #fff;
+            --primary-color: #4CAF50;
+            --secondary-color: #333;
+            --border-color: #555;
+        }
+        .high-contrast {
+            --main-bg-color: #f0e68c;
+            --main-text-color: #000;
+            --secondary-color: #fff;
+            --border-color: #000;
+        }
+
+        body {
+            font-family: sans-serif;
+            background-color: var(--main-bg-color);
+            color: var(--main-text-color);
+            padding: 20px;
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #chat-container {
+            max-width: 800px;
+            margin: auto;
+            background: var(--secondary-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        p#welcome-message {
+            font-size: 1.2em;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+
+        #messages {
+            border: 1px solid var(--border-color);
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #222;
+            border-radius: 6px;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 1em; /* Base font size */
+        }
+        .message.user {
+            text-align: right;
+            background-color: #4CAF50;
+            color: white;
+        }
+        .message.ai {
+            text-align: left;
+            background-color: #666;
+            color: white;
+        }
+        .message.error {
+            text-align: center;
+            background-color: #d32f2f;
+            color: white;
+        }
+
+        #input-area {
+            display: flex;
+        }
+        #prompt-input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            background-color: #333;
+            color: white;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        #send-button {
+            padding: 12px 20px;
+            margin-left: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        #send-button:hover {
+            background-color: #45a049;
+        }
+        .accessibility-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .accessibility-controls button {
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            background-color: var(--secondary-color);
+            color: var(--main-text-color);
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <h1>Bienvenido a IncluIA</h1>
     <div id="chat-container">
+        <h1>¡Hola! Soy IncluIA</h1>
+        <p id="welcome-message">
+            Tu asistente virtual para información legal, administrativa y de derechos en Perú.
+            Estamos aquí para brindarte respuestas claras y accesibles.
+        </p>
+        <div class="accessibility-controls">
+            <button id="listen-button">Escuchar Respuesta</button>
+            <button id="speak-button">Hablar</button>
+            <button id="contrast-button">Alto Contraste</button>
+            <select id="font-size-select">
+                <option value="small">A-</option>
+                <option value="medium" selected>A</option>
+                <option value="large">A+</option>
+            </select>
+        </div>
         <div id="messages"></div>
         <div id="input-area">
             <input type="text" id="prompt-input" placeholder="Escribe tu pregunta aquí..." />
