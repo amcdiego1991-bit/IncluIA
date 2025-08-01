@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
@@ -13,8 +14,8 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// Middleware para servir archivos estáticos (HTML, JS, CSS)
-app.use(express.static('public'));
+// Middleware para servir archivos estáticos (HTML, JS, CSS) desde la carpeta 'public'
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Ruta para la comunicación con la IA
 app.post('/ask-incluia', async (req, res) => {
