@@ -1,3 +1,4 @@
+const path = require('path');
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -12,6 +13,11 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 // Middlewares
 app.use(cors());
 app.use(express.json());
+
+// Ruta para servir el archivo HTML
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // Ruta para la comunicación con la IA
 app.post('/ask-incluia', async (req, res) => {
