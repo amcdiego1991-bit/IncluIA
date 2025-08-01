@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IncluIA</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f0f0f0; padding: 20px; }
+        #chat-container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        #messages { border: 1px solid #ddd; height: 300px; overflow-y: scroll; padding: 10px; margin-bottom: 10px; }
+        .message.user { text-align: right; color: blue; }
+        .message.ai { text-align: left; color: green; }
+        .message.error { text-align: center; color: red; }
+        #input-area { display: flex; }
+        #prompt-input { flex-grow: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        #send-button { padding: 10px; margin-left: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Bienvenido a IncluIA</h1>
+    <div id="chat-container">
+        <div id="messages"></div>
+        <div id="input-area">
+            <input type="text" id="prompt-input" placeholder="Escribe tu pregunta aquí..." />
+            <button id="send-button">Enviar</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
