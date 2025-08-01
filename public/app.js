@@ -11,9 +11,28 @@ document.addEventListener('DOMContentLoaded', () => {
     let recognition;
     let synthesis = window.speechSynthesis;
     let isSpeaking = false;
+    let isHighContrast = false;
+    let voicesLoaded = false;
+    let spanishVoice = null;
 
     // Base URL para el despliegue en Render
     const baseUrl = window.location.origin;
+
+    // -- Cargar voces de síntesis --
+    function loadVoices() {
+        if (voicesLoaded) return;
+        const voices = synthesis.getVoices();
+        spanishVoice = voices.find(voice => voice.lang.startsWith('es') && (voice.name.includes('Google') || voice.name.includes('Luciana')));
+        if (spanishVoice) {
+            console.log(`Voz en español seleccionada: ${spanishVoice.name}`);
+        } else {
+            console.log('No se encontró una voz en español más natural, usando la predeterminada.');
+        }
+        voicesLoaded = true;
+    }
+
+    synthesis.onvoiceschanged = loadVoices;
+    loadVoices(); // Llama a la función si las voces ya están cargadas
 
     // -- Event Listeners --
     sendButton.addEventListener('click', sendMessage);
@@ -57,7 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
             typingMessage.textContent = data.response;
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
-            // Leer la respuesta en voz alta si el modo de escucha está activo
             if (listenButton.textContent === 'Detener Escucha') {
                 speakText(data.response);
             }
@@ -80,15 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // -- Funciones de Voz --
     function toggleSpeechInput() {
-        if (recognition) {
+        if (recognition && recognition.start) {
             recognition.stop();
-        } else {
-            startSpeechInput();
+            return;
         }
-    }
 
-    function startSpeechInput() {
-        // Asegurarse de que la API de reconocimiento de voz está disponible
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
             alert('Lo siento, tu navegador no soporta el reconocimiento de voz.');
             return;
@@ -130,7 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
             listenButton.textContent = 'Escuchar Respuesta';
         } else {
             listenButton.textContent = 'Detener Escucha';
-            // Puedes agregar una lógica para leer la última respuesta aquí si lo deseas
         }
     }
 
@@ -140,12 +153,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'es-ES';
+        if (spanishVoice) {
+            utterance.voice = spanishVoice;
+        }
         synthesis.speak(utterance);
     }
 
     // -- Funciones de Accesibilidad Visual --
     function toggleHighContrast() {
-        body.classList.toggle('high-contrast');
+        isHighContrast = !isHighContrast;
+        if (isHighContrast) {
+            body.classList.add('high-contrast');
+        } else {
+            body.classList.remove('high-contrast');
+        }
     }
 
     function changeFontSize() {
@@ -168,64 +189,5 @@ document.addEventListener('DOMContentLoaded', () => {
             default:
                 return '1em';
         }
-    }
-});document.addEventListener('DOMContentLoaded', () => {
-    const promptInput = document.getElementById('prompt-input');
-    const sendButton = document.getElementById('send-button');
-    const messagesContainer = document.getElementById('messages');
-    const baseUrl = window.location.origin; // Obtiene la URL base de tu sitio
-
-    sendButton.addEventListener('click', sendMessage);
-    promptInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
-
-    async function sendMessage() {
-        const prompt = promptInput.value.trim();
-        if (prompt === '') return;
-
-        // Muestra el mensaje del usuario en el chat
-        appendMessage(prompt, 'user');
-        promptInput.value = '';
-
-        // Muestra un mensaje de "escribiendo" de la IA
-        const typingMessage = appendMessage('...', 'ai');
-
-        try {
-            // Envía la solicitud al servidor de Render
-            const response = await fetch(`${baseUrl}/ask-incluia`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ prompt: prompt })
-            });
-
-            if (!response.ok) {
-                throw new Error('Error al conectar con el servidor.');
-            }
-
-            const data = await response.json();
-
-            // Reemplaza el mensaje de "escribiendo" con la respuesta de la IA
-            typingMessage.textContent = data.response;
-
-        } catch (error) {
-            console.error('Error:', error);
-            typingMessage.textContent = 'Lo siento, hubo un error al obtener la respuesta.';
-            typingMessage.classList.add('error');
-        }
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    function appendMessage(text, sender) {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', sender);
-        messageElement.textContent = text;
-        messagesContainer.appendChild(messageElement);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        return messageElement;
     }
 });
