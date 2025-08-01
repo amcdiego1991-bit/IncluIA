@@ -147,17 +147,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function speakText(text) {
-        if (synthesis.speaking) {
-            synthesis.cancel();
-        }
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'es-ES';
-        if (spanishVoice) {
-            utterance.voice = spanishVoice;
-        }
-        synthesis.speak(utterance);
+function speakText(text) {
+    if (synthesis.speaking) {
+        synthesis.cancel();
     }
+    // Esta nueva línea elimina los dobles asteriscos del texto
+    const cleanedText = text.replace(/\*\*/g, '');
+
+    const utterance = new SpeechSynthesisUtterance(cleanedText);
+    utterance.lang = 'es-ES';
+    if (spanishVoice) {
+        utterance.voice = spanishVoice;
+    }
+    synthesis.speak(utterance);
+}
 
     // -- Funciones de Accesibilidad Visual --
     function toggleHighContrast() {
