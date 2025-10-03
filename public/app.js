@@ -121,3 +121,79 @@ document.addEventListener('DOMContentLoaded', () => {
         recognition.onresult = (event) => {
             const transcript = event.results[0][0].transcript;
             promptInput.value = transcript;
+            sendMessage();
+        };
+
+        recognition.onend = () => {
+            speakButton.textContent = 'Hablar';
+            speakButton.disabled = false;
+            recognition = null;
+        };
+
+        recognition.onerror = (event) => {
+            console.error(event.error);
+            speakButton.textContent = 'Hablar';
+            speakButton.disabled = false;
+            recognition = null;
+        };
+    }
+
+    function toggleSpeechOutput() {
+        if (synthesis.speaking) {
+            synthesis.cancel();
+            listenButton.textContent = 'Escuchar Respuesta';
+        } else {
+            listenButton.textContent = 'Detener Escucha';
+        }
+    }
+
+    function speakText(text) {
+        if (synthesis.speaking) {
+            synthesis.cancel();
+        }
+        // Esta línea es para limpiar el texto de asteriscos (opcional pero ayuda a la voz)
+        const cleanedText = text.replace(/\*\*/g, '');
+
+        const utterance = new SpeechSynthesisUtterance(cleanedText);
+        utterance.lang = 'es-ES';
+        if (spanishVoice) {
+            utterance.voice = spanishVoice;
+        }
+        synthesis.speak(utterance);
+    }
+
+    // -- Funciones de Accesibilidad Visual --
+    function toggleHighContrast() {
+        isHighContrast = !isHighContrast;
+        if (isHighContrast) {
+            body.classList.add('high-contrast');
+        } else {
+            body.classList.remove('high-contrast');
+        }
+    }
+
+    function changeFontSize() {
+        const size = fontSizeSelect.value;
+        const messages = messagesContainer.querySelectorAll('.message');
+        messages.forEach(msg => {
+            msg.style.fontSize = getFontSize(size);
+        });
+        body.style.fontSize = getFontSize(size);
+    }
+
+    function getFontSize(size) {
+        switch (size) {
+            case 'small':
+                return '0.8em';
+            case 'medium':
+                return '1em';
+            case 'large':
+                return '1.2em';
+            default:
+                return '1em';
+        }
+    }
+    // -- Mensaje de Bienvenida Original (Estable) --
+    appendMessage('¡Hola! Soy IncluIA, tu asistente virtual. Estoy aquí para brindarte información clara y accesible sobre temas legales, administrativos y de derechos en Perú, especialmente para personas con discapacidad visual, auditiva y motora. Mi objetivo es empoderarte dándote datos precisos para que puedas ejercer tus derechos y tomar decisiones informadas. ¿En qué puedo ayudarte hoy? ¡No dudes en preguntar!', 'ai');
+
+});
