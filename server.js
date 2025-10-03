@@ -29,7 +29,7 @@ app.post('/ask-incluia', async (req, res) => {
             return res.status(400).json({ error: 'El prompt es requerido.' });
         }
 
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
         // Crea una instrucción de sistema para guiar a la IA usando el corpus
         const systemPrompt = `
